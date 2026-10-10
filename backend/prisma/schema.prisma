@@ -1,0 +1,119 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  CUTTING_SUPERVISOR
+  CUTTING_VERIFIER
+  SEWING_SUPERVISOR
+}
+
+enum OrderStatus {
+  CUTTING_IN_PROGRESS
+  PENDING_VERIFICATION
+  REJECTED
+  VERIFIED
+  SEWING_IN_PROGRESS
+  COMPLETED
+}
+
+enum VerificationStatus {
+  GREEN
+  YELLOW
+  RED
+}
+
+enum VerificationDecision {
+  APPROVED
+  REJECTED
+}
+
+model User {
+  id               Int               @id @default(autoincrement())
+  email            String            @unique
+  passwordHash     String            @map("password_hash")
+  role             UserRole
+  fullName         String            @map("full_name")
+  createdAt        DateTime          @default(now()) @map("created_at")
+  cuttingOrders    CuttingOrder[]
+  verificationLogs VerificationLog[]
+
+  @@map("users")
+}
+
+model Recipe {
+  id             Int               @id @default(autoincrement())
+  recipeCode     String            @unique @map("recipe_code")
+  name           String
+  category       String
+  stdFabricYards Float             @map("std_fabric_yards")
+  wastageCap     Float             @map("wastage_cap")
+  components     RecipeComponent[]
+  cuttingOrders  CuttingOrder[]
+
+  @@map("recipes")
+}
+
+model RecipeComponent {
+  id                Int                @id @default(autoincrement())
+  recipeId          Int                @map("recipe_id")
+  componentName     String             @map("component_name")
+  piecesPerGarment  Int                @map("pieces_per_garment")
+  imageUrl          String?            @map("image_url")
+  recipe            Recipe             @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  verificationItems VerificationItem[]
+
+  @@map("recipe_components")
+}
+
+model CuttingOrder {
+  id                Int                @id @default(autoincrement())
+  orderNo           String             @unique @map("order_no")
+  recipeId          Int                @map("recipe_id")
+  targetQty         Int                @map("target_qty")
+  fabricRollId      String             @map("fabric_roll_id")
+  actualFabricYds   Float              @map("actual_fabric_yds")
+  status            OrderStatus        @default(CUTTING_IN_PROGRESS)
+  createdBy         Int                @map("created_by")
+  createdAt         DateTime            @default(now()) @map("created_at")
+  updatedAt         DateTime            @updatedAt @map("updated_at")
+  recipe            Recipe             @relation(fields: [recipeId], references: [id])
+  creator           User               @relation(fields: [createdBy], references: [id])
+  verificationItems VerificationItem[]
+  verificationLogs  VerificationLog[]
+
+  @@map("cutting_orders")
+}
+
+model VerificationItem {
+  id          Int                @id @default(autoincrement())
+  orderId     Int                @map("order_id")
+  componentId Int                @map("component_id")
+  expectedQty Int                @map("expected_qty")
+  actualQty   Int                @map("actual_qty")
+  status      VerificationStatus
+  order       CuttingOrder       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  component   RecipeComponent    @relation(fields: [componentId], references: [id])
+
+  @@unique([orderId, componentId])
+  @@map("verification_items")
+}
+
+model VerificationLog {
+  id            Int                  @id @default(autoincrement())
+  orderId       Int                  @map("order_id")
+  verifierId    Int                  @map("verifier_id")
+  decision      VerificationDecision
+  rejectionNote String?              @map("rejection_note")
+  wastagePct    Float                @map("wastage_pct")
+  timestamp     DateTime             @default(now())
+  order         CuttingOrder         @relation(fields: [orderId], references: [id])
+  verifier      User                 @relation(fields: [verifierId], references: [id])
+
+  @@map("verification_logs")
+}
