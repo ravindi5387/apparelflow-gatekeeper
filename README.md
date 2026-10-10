@@ -289,3 +289,11 @@ RED approval cannot be bypassed through the frontend.
 README.md — Project overview, setup and assessment evidence
 
 AI_OPTIMIZATION_REPORT.md — AI-assisted development and optimization report
+
+## 🚀 Live Demo
+
+**Frontend Application:** [ApparelFlow Gatekeeper](https://apparelflow-gatekeeper-omega.vercel.app)
+
+**Backend API:** [ApparelFlow Backend](https://apparelflow-gatekeeper-api.vercel.app)
+
+**API Health Check:** [Check Backend Status](https://apparelflow-gatekeeper-api.vercel.app/api/health)
