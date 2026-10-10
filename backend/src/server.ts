@@ -491,6 +491,7 @@ app.use((err: unknown, _req: express.Request, res: express.Response, _next: expr
 });
 
 export { app };
+export default app;
 
 if (require.main === module) {
   const port = Number(process.env.PORT || 5000);
