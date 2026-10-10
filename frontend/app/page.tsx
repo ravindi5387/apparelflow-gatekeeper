@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import type { FormEvent } from "react";
 import { api, clearToken, getToken, saveToken } from "../lib/api";
 import { StatusBadge } from "../components/StatusBadge";
@@ -85,7 +85,7 @@ function Icon({
     | "package"
     | "arrow";
 }) {
-  const paths: Record<string, JSX.Element> = {
+  const paths: Record<string, React.ReactElement> = { {
     grid: (
       <>
         <rect x="3" y="3" width="7" height="7" rx="1" />
