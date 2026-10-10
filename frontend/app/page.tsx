@@ -85,7 +85,7 @@ function Icon({
     | "package"
     | "arrow";
 }) {
-  const paths: Record<string, React.ReactElement> = { {
+  const paths: Record<string, React.ReactElement> = { 
     grid: (
       <>
         <rect x="3" y="3" width="7" height="7" rx="1" />
